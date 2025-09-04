@@ -10,7 +10,7 @@ from digikala_scraper.property_analyzer import PropertyAnalyzer
 
 
 class ProductDetailsSpider(scrapy.Spider):
-    name = "digikalaProduct"
+    name = "product"
     
     def __init__(self, *args, **kwargs):
         super(ProductDetailsSpider, self).__init__(*args, **kwargs)

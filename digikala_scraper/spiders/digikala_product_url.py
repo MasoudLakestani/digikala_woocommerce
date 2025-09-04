@@ -9,7 +9,7 @@ from digikala_scraper.items import *
 from scrapy.exceptions import DontCloseSpider
 
 class ProductsSpider(scrapy.Spider):
-    name = "digikalaProductUrl"
+    name = "url"
 
     def start_requests(self):
         with open("category_url.txt", mode="r", encoding="utf-8-sig") as f:

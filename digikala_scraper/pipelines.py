@@ -84,7 +84,7 @@ class DynamicCSVPipeline:
     def process_item(self, item, spider):
         """Process each item and check if we need to expand columns"""
         # Only process product details, not URLs
-        if spider.name != "digikalaProductDetails":
+        if spider.name != "product":
             return item
         # Count properties in this item - only check fields that are actually set
         item_properties = 0
