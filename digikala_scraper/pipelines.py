@@ -169,13 +169,13 @@ class URLCSVPipeline:
     
     def open_spider(self, spider):
         """Open CSV file and prepare writer"""
-        if spider.name == "digikalaProductUrl":
+        if spider.name == "url":
             self.file = open(self.csv_file, 'w', newline='', encoding='utf-8-sig')
             self.writer = csv.writer(self.file)
     
     def process_item(self, item, spider):
-        """Process URL items for digikalaProductUrl spider"""
-        if spider.name == "digikalaProductUrl":
+        """Process URL items for url spider"""
+        if spider.name == "url":
             if not self.headers_written:
                 # Write headers based on item fields
                 headers = list(item.fields.keys())
