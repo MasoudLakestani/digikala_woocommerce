@@ -41,7 +41,7 @@ class DynamicCSVPipeline:
     def _analyze_existing_csv(self):
         """Analyze existing CSV to determine current max properties"""
         try:
-            with open(self.csv_file, 'r', encoding='utf-8') as f:
+            with open(self.csv_file, 'r', encoding='utf-8-sig') as f:
                 reader = csv.reader(f)
                 headers = next(reader, [])
                 
@@ -138,7 +138,7 @@ class DynamicCSVPipeline:
         spider.logger.info(f"Writing {len(self.items_buffer)} items to CSV with {self.max_properties} properties")
         
         # Write CSV with all collected data
-        with open(self.csv_file, 'w', newline='', encoding='utf-8') as f:
+        with open(self.csv_file, 'w', newline='', encoding='utf-8-sig') as f:
             writer = csv.DictWriter(f, fieldnames=self.fieldnames, extrasaction='ignore')
             writer.writeheader()
             
@@ -170,7 +170,7 @@ class URLCSVPipeline:
     def open_spider(self, spider):
         """Open CSV file and prepare writer"""
         if spider.name == "digikalaProductUrl":
-            self.file = open(self.csv_file, 'w', newline='', encoding='utf-8')
+            self.file = open(self.csv_file, 'w', newline='', encoding='utf-8-sig')
             self.writer = csv.writer(self.file)
     
     def process_item(self, item, spider):
