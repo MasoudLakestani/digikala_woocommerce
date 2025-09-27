@@ -5,3 +5,5 @@
 __pycache__/
 *.csv
 images
+category_url.txt
+sku.txt

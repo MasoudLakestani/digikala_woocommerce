@@ -243,8 +243,8 @@ class ProductDetailsSpider(scrapy.Spider):
         product["آیا ویژه است؟"] = is_special
         
         product["قابل مشاهده در کاتالوگ"] = "visible"
-        product["توضیح کوتاه"] = product_data.get("review", {}).get("description", "")[:500] + "..." if len(product_data.get("review", {}).get("description", "")) > 500 else product_data.get("review", {}).get("description", "")
-        product["توضیحات"] = product_data.get("review", {}).get("description", "")
+        product["توضیح کوتاه"] = None
+        product["توضیحات"] = None
         product["تاریخ شروع فروش ویژه"] = ""
         product["تاریخ پایان فروش ویژه"] = ""
         product["وضعیت مالیات"] = "taxable"
