@@ -54,9 +54,9 @@ def create_dynamic_product_item(max_properties=0):
     
     # Add dynamic property fields - grouped by property number for proper CSV column ordering
     for i in range(1, max_properties + 1):
-        class_dict[f'نام {i} صفت'] = scrapy.Field()
-        class_dict[f'مقدار {i} صفت'] = scrapy.Field()
-        class_dict[f'نمایان بودن {i} صفت'] = scrapy.Field()
+        class_dict[f'Attribute {i} name'] = scrapy.Field()
+        class_dict[f'Attribute {i} value(s)'] = scrapy.Field()
+        class_dict[f'Attribute {i} visible'] = scrapy.Field()
     
     # Create custom Item class that preserves field order
     class OrderedProductItem(scrapy.Item):

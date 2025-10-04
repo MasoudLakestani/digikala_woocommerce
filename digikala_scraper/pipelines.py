@@ -48,12 +48,12 @@ class DynamicCSVPipeline:
                 # Count existing property columns
                 property_count = 0
                 for header in headers:
-                    if 'صفت' in header and header.endswith('صفت'):
-                        # Extract property number from field name like "نام 5 صفت"
+                    if header.startswith('Attribute ') and ' name' in header:
+                        # Extract property number from field name like "Attribute 5 name"
                         try:
                             parts = header.split(' ')
-                            if len(parts) >= 3 and parts[-1] == 'صفت':
-                                prop_num = int(parts[-2])  # Second to last part should be the number
+                            if len(parts) >= 3 and parts[0] == 'Attribute' and parts[2] == 'name':
+                                prop_num = int(parts[1])
                                 property_count = max(property_count, prop_num)
                         except (ValueError, IndexError):
                             continue
@@ -89,12 +89,12 @@ class DynamicCSVPipeline:
         # Count properties in this item - only check fields that are actually set
         item_properties = 0
         for field_name in item.fields:
-            if field_name in item and 'صفت' in field_name and field_name.endswith('صفت'):
+            if field_name in item and field_name.startswith('Attribute ') and ' name' in field_name:
                 try:
-                    # Handle new format: "نام 1 صفت" instead of "نام_1_صفت"
+                    # Handle format: "Attribute 1 name"
                     parts = field_name.split(' ')
-                    if len(parts) >= 3 and parts[-1] == 'صفت':
-                        prop_num = int(parts[-2])  # Second to last part should be the number
+                    if len(parts) >= 3 and parts[0] == 'Attribute' and parts[2] == 'name':
+                        prop_num = int(parts[1])
                         item_properties = max(item_properties, prop_num)
                 except (ValueError, IndexError):
                     continue
@@ -117,17 +117,17 @@ class DynamicCSVPipeline:
     def _expand_fieldnames(self, new_max_properties):
         """Expand fieldnames to include new property columns"""
         # Remove old property columns
-        base_fields = [f for f in self.fieldnames if 'صفت' not in f or not f.endswith('صفت')]
-        
+        base_fields = [f for f in self.fieldnames if not (f.startswith('Attribute ') and (' name' in f or ' value(s)' in f or ' visible' in f))]
+
         # Add new property columns in correct order
         new_fields = base_fields.copy()
         for i in range(1, new_max_properties + 1):
             new_fields.extend([
-                f'نام {i} صفت',
-                f'مقدار {i} صفت', 
-                f'نمایان بودن {i} صفت'
+                f'Attribute {i} name',
+                f'Attribute {i} value(s)',
+                f'Attribute {i} visible'
             ])
-        
+
         self.fieldnames = new_fields
     
     def close_spider(self, spider):

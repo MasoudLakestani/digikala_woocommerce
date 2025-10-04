@@ -320,25 +320,25 @@ class ProductDetailsSpider(scrapy.Spider):
         
         if color_name:
             # For variations, use the specific color
-            product[f"نام {property_index} صفت"] = "رنگ"
-            product[f"مقدار {property_index} صفت"] = color_name
-            product[f"نمایان بودن {property_index} صفت"] = "1"
+            product[f"Attribute {property_index} name"] = "رنگ"
+            product[f"Attribute {property_index} value(s)"] = color_name
+            product[f"Attribute {property_index} visible"] = "1"
             property_index += 1
         elif product_colors:
             # For simple and variable products, add color(s)
             if len(product_colors) == 1:
                 # Single color for simple products
                 color = product_colors[0]
-                product[f"نام {property_index} صفت"] = "رنگ"
-                product[f"مقدار {property_index} صفت"] = color.get("title", "")
-                product[f"نمایان بودن {property_index} صفت"] = "1"
+                product[f"Attribute {property_index} name"] = "رنگ"
+                product[f"Attribute {property_index} value(s)"] = color.get("title", "")
+                product[f"Attribute {property_index} visible"] = "1"
                 property_index += 1
             else:
                 # Multiple colors for variable products - comma separated
                 color_names = [color.get("title", "") for color in product_colors]
-                product[f"نام {property_index} صفت"] = "رنگ"
-                product[f"مقدار {property_index} صفت"] = ",".join(color_names)
-                product[f"نمایان بودن {property_index} صفت"] = "1"
+                product[f"Attribute {property_index} name"] = "رنگ"
+                product[f"Attribute {property_index} value(s)"] = ",".join(color_names)
+                product[f"Attribute {property_index} visible"] = "1"
                 property_index += 1
         
         for spec_group in specifications:
@@ -365,9 +365,13 @@ class ProductDetailsSpider(scrapy.Spider):
                             product[key] = value
                     
                     # Now safely add the property
-                    product[f"نام {property_index} صفت"] = attribute.get("title", "")
-                    product[f"مقدار {property_index} صفت"] = str(attribute.get("values", []))
-                    product[f"نمایان بودن {property_index} صفت"] = "1" 
+                    values = attribute.get("values", [])
+                    # Convert list to comma-separated string without brackets
+                    values_str = ", ".join(str(v) for v in values) if isinstance(values, list) else str(values)
+
+                    product[f"Attribute {property_index} name"] = attribute.get("title", "")
+                    product[f"Attribute {property_index} value(s)"] = values_str
+                    product[f"Attribute {property_index} visible"] = "1"
                     property_index += 1
 
         return product
