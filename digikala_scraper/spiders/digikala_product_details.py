@@ -302,8 +302,8 @@ class ProductDetailsSpider(scrapy.Spider):
         # Get pricing from default variant
         if isinstance(default_variant, dict):
             variant_price = default_variant.get("price", {})
-            regular_price = variant_price.get("rrp_price", variant_price.get("selling_price", ""))
-            selling_price = variant_price.get("selling_price", "")
+            regular_price = variant_price.get("rrp_price", variant_price.get("selling_price", "")) /10
+            selling_price = variant_price.get("selling_price", "") / 10 
         else:
             regular_price = ""
             selling_price = ""
