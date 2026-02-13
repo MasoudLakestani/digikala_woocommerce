@@ -117,7 +117,7 @@ class DynamicCSVPipeline:
     def _expand_fieldnames(self, new_max_properties):
         """Expand fieldnames to include new property columns"""
         # Remove old property columns
-        base_fields = [f for f in self.fieldnames if not (f.startswith('Attribute ') and (' name' in f or ' value(s)' in f or ' visible' in f))]
+        base_fields = [f for f in self.fieldnames if not (f.startswith('Attribute ') and (' name' in f or ' value(s)' in f or ' visible' in f or ' global' in f))]
 
         # Add new property columns in correct order
         new_fields = base_fields.copy()
@@ -125,7 +125,8 @@ class DynamicCSVPipeline:
             new_fields.extend([
                 f'Attribute {i} name',
                 f'Attribute {i} value(s)',
-                f'Attribute {i} visible'
+                f'Attribute {i} visible',
+                f'Attribute {i} global'
             ])
 
         self.fieldnames = new_fields

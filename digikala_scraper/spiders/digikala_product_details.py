@@ -252,17 +252,11 @@ class ProductDetailsSpider(scrapy.Spider):
         
         # Stock information
         default_variant = product_data.get("default_variant", {})
-        if isinstance(default_variant, dict):
-            stock_info = default_variant.get("price", {})
-            stock_count = stock_info.get("marketable_stock", 0)
-        else:
-            stock_count = 0
-        product["در انبار؟"] = "1" if stock_count > 0 else "0"
-        product["انبار"] = str(stock_count)
-        product["کمبود موجودی انبار"] = "1" if stock_count < 5 else "0"
-        
-        product["پیش‌فروش مجاز است؟"] = "0"
-        product["فروش به صورت جداگانه؟"] = "1"
+        product["در انبار؟"] = ""
+        product["انبار"] = ""
+        product["کمبود موجودی انبار"] = ""
+        product["پیش‌فروش مجاز است؟"] = ""
+        product["فروش به صورت جداگانه؟"] = ""
         
         # Try to get product dimensions if available
         product["وزن"] = ""
@@ -323,6 +317,7 @@ class ProductDetailsSpider(scrapy.Spider):
             product[f"Attribute {property_index} name"] = "رنگ"
             product[f"Attribute {property_index} value(s)"] = color_name
             product[f"Attribute {property_index} visible"] = "1"
+            product[f"Attribute {property_index} global"] = ""
             property_index += 1
         elif product_colors:
             # For simple and variable products, add color(s)
@@ -332,6 +327,7 @@ class ProductDetailsSpider(scrapy.Spider):
                 product[f"Attribute {property_index} name"] = "رنگ"
                 product[f"Attribute {property_index} value(s)"] = color.get("title", "")
                 product[f"Attribute {property_index} visible"] = "1"
+                product[f"Attribute {property_index} global"] = "0"
                 property_index += 1
             else:
                 # Multiple colors for variable products - comma separated
@@ -339,40 +335,44 @@ class ProductDetailsSpider(scrapy.Spider):
                 product[f"Attribute {property_index} name"] = "رنگ"
                 product[f"Attribute {property_index} value(s)"] = ",".join(color_names)
                 product[f"Attribute {property_index} visible"] = "1"
+                product[f"Attribute {property_index} global"] = "0"
                 property_index += 1
         
-        for spec_group in specifications:
-            if isinstance(spec_group, dict) and 'attributes' in spec_group:
-                for attribute in spec_group['attributes']:
-                    # Check if we need to expand the ProductItem dynamically
-                    if property_index > self.max_properties:
-                        self.logger.warning(f"Product {product_data.get('id')} has {property_index} properties, but ProductItem only supports {self.max_properties}. Expanding dynamically...")
-                        # Recreate ProductItem with more fields
-                        new_max = property_index + 10  # Add some buffer
-                        self.DynamicProductItem = create_dynamic_product_item(new_max)
-                        self.max_properties = new_max
-                        
-                        # Recreate the product item with the new class
-                        old_data = {}
-                        # Only copy fields that have been set
-                        for key in product.fields:
-                            if key in product:
-                                old_data[key] = product[key]
-                        
-                        product = self.DynamicProductItem()
-                        # Copy existing data
-                        for key, value in old_data.items():
-                            product[key] = value
-                    
-                    # Now safely add the property
-                    values = attribute.get("values", [])
-                    # Convert list to comma-separated string without brackets
-                    values_str = ", ".join(str(v) for v in values) if isinstance(values, list) else str(values)
+        # Only add specification attributes for simple and variable products, not variations
+        if color_name is None:
+            for spec_group in specifications:
+                if isinstance(spec_group, dict) and 'attributes' in spec_group:
+                    for attribute in spec_group['attributes']:
+                        # Check if we need to expand the ProductItem dynamically
+                        if property_index > self.max_properties:
+                            self.logger.warning(f"Product {product_data.get('id')} has {property_index} properties, but ProductItem only supports {self.max_properties}. Expanding dynamically...")
+                            # Recreate ProductItem with more fields
+                            new_max = property_index + 10  # Add some buffer
+                            self.DynamicProductItem = create_dynamic_product_item(new_max)
+                            self.max_properties = new_max
 
-                    product[f"Attribute {property_index} name"] = attribute.get("title", "")
-                    product[f"Attribute {property_index} value(s)"] = values_str
-                    product[f"Attribute {property_index} visible"] = "1"
-                    property_index += 1
+                            # Recreate the product item with the new class
+                            old_data = {}
+                            # Only copy fields that have been set
+                            for key in product.fields:
+                                if key in product:
+                                    old_data[key] = product[key]
+
+                            product = self.DynamicProductItem()
+                            # Copy existing data
+                            for key, value in old_data.items():
+                                product[key] = value
+
+                        # Now safely add the property
+                        values = attribute.get("values", [])
+                        # Convert list to comma-separated string without brackets
+                        values_str = ", ".join(str(v) for v in values) if isinstance(values, list) else str(values)
+
+                        product[f"Attribute {property_index} name"] = attribute.get("title", "")
+                        product[f"Attribute {property_index} value(s)"] = values_str
+                        product[f"Attribute {property_index} visible"] = "1"
+                        product[f"Attribute {property_index} global"] = "0"
+                        property_index += 1
 
         return product
         

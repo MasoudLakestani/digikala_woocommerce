@@ -57,6 +57,7 @@ def create_dynamic_product_item(max_properties=0):
         class_dict[f'Attribute {i} name'] = scrapy.Field()
         class_dict[f'Attribute {i} value(s)'] = scrapy.Field()
         class_dict[f'Attribute {i} visible'] = scrapy.Field()
+        class_dict[f'Attribute {i} global'] = scrapy.Field()
     
     # Create custom Item class that preserves field order
     class OrderedProductItem(scrapy.Item):
