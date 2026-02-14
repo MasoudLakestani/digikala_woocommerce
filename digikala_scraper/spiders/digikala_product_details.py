@@ -189,7 +189,7 @@ class ProductDetailsSpider(scrapy.Spider):
         product["SKU"] = sku
         product["نوع"] = "simple"
         product["نام"] = product_data.get("title_fa", "")
-        product["منتشر شده"] = "1" if product_data.get("status") == "marketable" else "0"
+        product["منتشر شده"] = "1"
         
         # Fill product data
         colors = product_data.get("colors", [])
@@ -205,7 +205,7 @@ class ProductDetailsSpider(scrapy.Spider):
         product["SKU"] = base_sku
         product["نوع"] = "variable"
         product["نام"] = product_data.get("title_fa", "")
-        product["منتشر شده"] = "1" if product_data.get("status") == "marketable" else "0"
+        product["منتشر شده"] = "1"
         product["مادر"] = ""
         
         # Fill product data
@@ -225,7 +225,7 @@ class ProductDetailsSpider(scrapy.Spider):
         product["SKU"] = variation_sku
         product["نوع"] = "variation"
         product["نام"] = f"{product_data.get('title_fa', '')} - {color_name}"
-        product["منتشر شده"] = "1" if product_data.get("status") == "marketable" else "0"
+        product["منتشر شده"] = "1"
         product["مادر"] = base_sku
         
         # Fill product data
@@ -237,10 +237,7 @@ class ProductDetailsSpider(scrapy.Spider):
         
         # Get colors to determine if we need to add color as property
         colors = product_data.get("colors", [])
-        # Check if product has special pricing
-        price_data = product_data.get("price", {})
-        is_special = "1" if price_data.get("discount_percent", 0) > 0 else "0"
-        product["آیا ویژه است؟"] = is_special
+        product["آیا ویژه است؟"] = "0"
         
         product["قابل مشاهده در کاتالوگ"] = "visible"
         product["توضیح کوتاه"] = None
@@ -252,7 +249,7 @@ class ProductDetailsSpider(scrapy.Spider):
         
         # Stock information
         default_variant = product_data.get("default_variant", {})
-        product["در انبار؟"] = ""
+        product["در انبار؟"] = "1"
         product["انبار"] = ""
         product["کمبود موجودی انبار"] = ""
         product["پیش‌فروش مجاز است؟"] = ""
@@ -265,14 +262,7 @@ class ProductDetailsSpider(scrapy.Spider):
         product["بلندا"] = ""
         product["یادداشت خرید"] = ""
         
-        # Categories
-        intrack_data = jsonresponse.get("data", {}).get("intrack", {}).get("eventData", {})
-        categories = []
-        for i in range(1, 6):
-            cat = intrack_data.get(f"categoryLevel{i}", "")
-            if cat:
-                categories.append(cat)
-        product["دسته‌ها"] = " > ".join(categories)
+        product["دسته‌ها"] = ""
         
         product["برچسب‌ها"] = ""
         product["کلاس حمل و نقل"] = ""
@@ -303,7 +293,7 @@ class ProductDetailsSpider(scrapy.Spider):
             selling_price = ""
         
         product["قیمت عادی"] = str(regular_price) if regular_price else ""
-        product["قیمت فروش ویژه"] = str(selling_price) if selling_price else ""
+        product["قیمت فروش ویژه"] = ""
 
         # Handle dynamic properties from specifications
         specifications = product_data.get("specifications", [])
